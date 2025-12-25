@@ -1,14 +1,12 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import  prisma  from "@/lib/prisma";
 
-// 🔗 ASSIGN permissions to a role
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// ASSIGN permissions to a role
+export async function POST(req: NextRequest, context: any) {
   try {
-    const { id: roleId } = await params;
-    const { permissionIds } = await req.json(); // string[]
+    const roleId = context.params.id;
+
+    const { permissionIds } = await req.json();
 
     if (!Array.isArray(permissionIds)) {
       return NextResponse.json(
@@ -17,22 +15,20 @@ export async function POST(
       );
     }
 
-    // delete old mappings
-    await prisma.rolePermission.deleteMany({
-      where: { roleId },
-    });
-
-    // create new mappings
     await prisma.rolePermission.createMany({
       data: permissionIds.map((pid: string) => ({
         roleId,
         permissionId: pid,
       })),
+      skipDuplicates: true,
     });
 
-    return NextResponse.json({ message: "Permissions assigned to role" });
-  } catch (err) {
-    console.error(err);
+    return NextResponse.json(
+      { message: "Permissions assigned to role" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { message: "Failed to assign permissions" },
       { status: 500 }
@@ -40,13 +36,10 @@ export async function POST(
   }
 }
 
-// 📄 GET permissions of a role
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// GET permissions of a role
+export async function GET(_req: NextRequest, context: any) {
   try {
-    const { id: roleId } = await params;
+    const roleId = context.params.id;
 
     const role = await prisma.role.findUnique({
       where: { id: roleId },
@@ -66,15 +59,16 @@ export async function GET(
       );
     }
 
-    const permissions = role.permissions.map((rp) => rp.permission);
-
-    return NextResponse.json({
-      id: role.id,
-      name: role.name,
-      permissions,
-    });
-  } catch (err) {
-    console.error(err);
+    return NextResponse.json(
+      {
+        id: role.id,
+        name: role.name,
+        permissions: role.permissions.map((rp) => rp.permission),
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { message: "Failed to fetch role permissions" },
       { status: 500 }

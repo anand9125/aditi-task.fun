@@ -1,5 +1,5 @@
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 // ➕ CREATE permission
 export async function POST(req: Request) {
@@ -39,7 +39,6 @@ export async function POST(req: Request) {
   }
 }
 
-// 📄 LIST permissions
 export async function GET() {
   try {
     const permissions = await prisma.permission.findMany({

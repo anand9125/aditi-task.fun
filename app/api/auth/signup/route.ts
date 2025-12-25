@@ -1,6 +1,8 @@
+export const runtime = 'nodejs';
+
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -27,7 +29,8 @@ export async function POST(req: Request) {
     }
 
     // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // create user
     const user = await prisma.user.create({

@@ -1,5 +1,5 @@
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 // 🔗 Assign roles to a user
 export async function POST(
@@ -66,7 +66,7 @@ export async function GET(
       );
     }
 
-    const roles = user.roles.map((ur) => ur.role);
+    const roles = user.roles.map((ur:any) => ur.role);
 
     return NextResponse.json({
       id: user.id,
