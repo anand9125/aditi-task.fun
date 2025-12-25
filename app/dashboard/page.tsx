@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import DashboardLayout from '../components/layout/DashboardLayout';
+import DashboardLayout from './components/layout/DashboardLayout';
 import { useRBACStore } from '../store/rbacStore';
 import { Key, Users, Link as LinkIcon, TrendingUp, Shield, Activity } from 'lucide-react';
 
